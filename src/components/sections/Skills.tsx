@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { useState, type CSSProperties } from "react";
 import { OutlineWord } from "@/components/ui/OutlineWord";
 import { Reveal } from "@/components/ui/Reveal";
@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 type Filter = "all" | SkillCategoryId;
 
 export function Skills() {
-  const reduce = useReducedMotion();
   const [filter, setFilter] = useState<Filter>("all");
 
   const filters: { id: Filter; label: string }[] = [
@@ -83,24 +82,20 @@ export function Skills() {
 
                   <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {cat.skills.map((skill, si) => (
-                      <motion.li
-                        key={skill.name}
-                        initial={reduce ? false : { opacity: 0, y: 14 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-40px" }}
-                        transition={{ duration: 0.6, delay: si * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                      >
-                        <div
-                          style={{ "--c": skill.color } as CSSProperties}
-                          className="group flex h-full flex-col items-start gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05] hover:shadow-[0_18px_40px_-18px_var(--c)]"
-                        >
-                          <skill.icon
-                            aria-hidden="true"
-                            className="size-7 text-white/60 transition-all duration-300 group-hover:scale-110 group-hover:text-[var(--c)]"
-                          />
-                          <span className="text-sm font-medium text-white/90">{skill.name}</span>
-                        </div>
-                      </motion.li>
+                      <li key={skill.name}>
+                        <Reveal y={14} delay={si * 0.05} className="h-full">
+                          <div
+                            style={{ "--c": skill.color } as CSSProperties}
+                            className="group flex h-full flex-col items-start gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05] hover:shadow-[0_18px_40px_-18px_var(--c)]"
+                          >
+                            <skill.icon
+                              aria-hidden="true"
+                              className="size-7 text-white/60 transition-all duration-300 group-hover:scale-110 group-hover:text-[var(--c)]"
+                            />
+                            <span className="text-sm font-medium text-white/90">{skill.name}</span>
+                          </div>
+                        </Reveal>
+                      </li>
                     ))}
                   </ul>
                 </div>
