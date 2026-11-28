@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
+import { REVEAL_EASE, useRevealOnScroll } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 
 interface AnimatedHeadingProps {
@@ -22,31 +22,36 @@ export function AnimatedHeading({
   delay = 0,
   id,
 }: AnimatedHeadingProps) {
-  const reduce = useReducedMotion();
+  const { ref, phase } = useRevealOnScroll<HTMLHeadingElement>();
   const words = text.split(" ");
   const marks = highlight.map((w) => w.toLowerCase());
 
   return (
-    <Tag id={id} className={cn("font-display", className)} aria-label={text}>
+    <Tag ref={ref} id={id} className={cn("font-display", className)} aria-label={text}>
       {words.map((word, i) => {
         const bare = word.replace(/[^\p{L}\p{N}']/gu, "").toLowerCase();
         const isMarked = marks.includes(bare);
+
+        const style =
+          phase === "hidden"
+            ? { transform: "translateY(110%)" }
+            : phase === "shown"
+              ? {
+                  transform: "none",
+                  transition: `transform 900ms ${REVEAL_EASE} ${delay + i * 0.06}s`,
+                }
+              : undefined;
+
         return (
           <span
             key={`${word}-${i}`}
             aria-hidden="true"
             className="inline-block overflow-hidden pb-[0.08em] align-bottom"
           >
-            <motion.span
-              className={cn("inline-block", isMarked && "text-gradient")}
-              initial={reduce ? false : { y: "110%" }}
-              whileInView={{ y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.9, delay: delay + i * 0.06, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <span className={cn("inline-block", isMarked && "text-gradient")} style={style}>
               {word}
-              {i < words.length - 1 ? " " : ""}
-            </motion.span>
+              {i < words.length - 1 ? "\u00A0" : ""}
+            </span>
           </span>
         );
       })}
